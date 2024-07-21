@@ -1,0 +1,9 @@
+calculo_rendimiento/
+├── publico/
+│   └── datos_combustible.csv
+├── src/
+│   ├── calculadora_rendimiento.py
+│   └── generar_grafica.py
+├── index.html
+├── README.md
+└── requirements.txt
