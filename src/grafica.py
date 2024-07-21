@@ -1,22 +1,54 @@
 # src/grafica.py
 
+# src/generar_grafica.py
+
 import pandas as pd
 
-def leer_datos(archivo):
-    return pd.read_csv(archivo)
+def generar_html(data):
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
 
-def calcular_rendimiento(data):
-    data['rendimiento'] = data['kilometros'] / data['combustible']
-    return data
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Fecha', 'Rendimiento'],
+    """
 
-def guardar_datos(data, archivo_salida):
-    data.to_csv(archivo_salida, index=False)
+    for _, row in data.iterrows():
+        html += f"['{row['fecha']}', {row['rendimiento']}],\n"
+
+    html += """
+                ]);
+
+                var options = {
+                    title: 'Rendimiento de Combustible',
+                    curveType: 'function',
+                    legend: { position: 'bottom' }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+                chart.draw(data, options);
+            }
+        </script>
+    </head>
+    <body>
+        <div id="curve_chart" style="width: 900px; height: 500px"></div>
+    </body>
+    </html>
+    """
+
+    with open('index.html', 'w') as file:
+        file.write(html)
 
 def main():
-    datos = leer_datos('data/datos_combustible.csv')
-    datos_rendimiento = calcular_rendimiento(datos)
-    guardar_datos(datos_rendimiento, 'data/datos_rendimiento.csv')
-    print("Datos de rendimiento calculados y guardados en 'data/datos_rendimiento.csv'")
+    datos = pd.read_csv('data/datos_rendimiento.csv')
+    generar_html(datos)
+    print("Gráfica generada y guardada en 'index.html'")
 
 if __name__ == "__main__":
     main()
